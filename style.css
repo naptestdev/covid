@@ -16,3 +16,20 @@ body {
 .error {
   display: none;
 }
+
+.countries {
+  width: 100%;
+  max-width: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.countries button {
+  display: block;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  width: 100%;
+  padding: 10px 0;
+  cursor: pointer;
+}
