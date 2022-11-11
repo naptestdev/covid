@@ -1,33 +1,26 @@
+let data;
+
 fetch("https://api.covid19api.com/summary")
   .then((res) => {
     if (!res.ok) {
       showError();
     } else {
-      res.json().then((data) => {
-        if (data.Message === "Caching in progress") {
-          showError(data.Message);
+      res.json().then((info) => {
+        data = info;
+
+        if (info.Message === "Caching in progress") {
+          showError(info.Message);
         } else {
-          console.log(data);
-          document.querySelector("select").innerHTML = `
-            <option value="World">World</option>
-            ${data.Countries.map(
+          console.log(info);
+          document.querySelector(".countries").innerHTML = `
+            <button onclick="buttonClicked('World')">World</button>
+            ${info.Countries.map(
               (country) =>
-                `<option value="${country.Country}">${country.Country}</option>`
-            )}
+                `<button onclick="buttonClicked('${country.Country}')">${country.Country}</button>`
+            ).join("")}
           `;
 
-          showContent(data.Global);
-
-          document.querySelector("select").addEventListener("change", (e) => {
-            const value = e.target.value;
-            if (value === "World") {
-              showContent(data.Global);
-            } else {
-              showContent(
-                data.Countries.find((country) => country.Country === value)
-              );
-            }
-          });
+          showContent(info.Global);
         }
       });
     }
@@ -37,6 +30,21 @@ fetch("https://api.covid19api.com/summary")
     showError();
   });
 
+document.querySelector("input").addEventListener("keyup", (e) => {
+  const value = e.target.value;
+  document.querySelectorAll(".countries button").forEach((item) => {
+    if (value.trim() === "") {
+      item.style.display = "block";
+    } else {
+      if (item.innerText.toLowerCase().includes(value.trim().toLowerCase())) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+    }
+  });
+});
+
 const showError = (message = "") => {
   document.querySelector(".loading").style.display = "none";
   document.querySelector(".error").style.display = "flex";
@@ -45,6 +53,14 @@ const showError = (message = "") => {
     document.querySelector(
       ".error"
     ).innerText = `Failed to load data. "${message}"`;
+  }
+};
+
+const buttonClicked = (id) => {
+  if (id === "World") {
+    showContent(data.Global);
+  } else {
+    showContent(data.Countries.find((country) => country.Country === id));
   }
 };
 
